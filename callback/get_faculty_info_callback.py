@@ -1,5 +1,6 @@
 from aiogram.filters.callback_data import CallbackData
 
 
-class GetFacultyInfoCallbackFactory(CallbackData, prefix="faculties"):
-    index: int
+class GetWayInfoCallbackFactory(CallbackData, prefix="faculties"):
+    faculty_id: int
+    way_id: int
