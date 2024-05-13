@@ -1,0 +1,5 @@
+aiogram==3.3.0
+python-dotenv
+pillow
+dateparser
+pymongo
