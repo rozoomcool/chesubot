@@ -51,3 +51,55 @@ if __name__ == "__main__":
   logging.basicConfig(level=logging.INFO, stream=sys.stdout)
   asyncio.run(main())
 ```
+  - Коллбэки, которые служат для вызова функций и передачи между ними параметров
+```
+class GetDocumentsCallbackFactory(CallbackData, prefix="documents"):
+    pass
+class GetFacultiesCallbackFactory(CallbackData, prefix="faculties"):
+    pass
+class GetWayInfoCallbackFactory(CallbackData, prefix="faculties"):
+    faculty_id: int
+    way_id: int
+class GetWaysCallbackFactory(CallbackData, prefix="ways"):
+    facultyId: int
+class StartCallback(CallbackData, prefix="startt"):
+    pass
+```
+
+#### Стартовый роутер
+##### Инизиализация роутера: `start_router = Router()`
+##### Ендпоинт для команды /start
+```
+@start_router.message(CommandStart())
+async def command_start(message: Message) -> None:
+    await message.answer(
+        f"Привет, абитуриент {hbold(message.from_user.full_name)}",
+        reply_markup=start_keyboard()
+    )
+```
+##### Коллбэк, который вызывает фукнцию start
+```
+@start_router.callback_query(StartCallback.filter())
+async def command_start(callback: CallbackQuery) -> None:
+    await callback.message.delete()
+    await callback.message.answer(
+        f"Привет, абитуриент {hbold(callback.from_user.full_name)}",
+        reply_markup=start_keyboard()
+    )
+```
+
+#### Роутер с информацией о документах
+##### Инизиализация роутера: `documents_router = Router()`
+##### Коллбэк для выдачи перечня документов
+```
+@documents_router.callback_query(GetDocumentsCallbackFactory.filter())
+async def process_get_documents(callback: CallbackQuery):
+    await callback.message.delete()
+    await callback.message.answer(texts.documents_info, reply_markup=document_keyboard())
+```
+
+
+
+
+
+
