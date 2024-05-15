@@ -24,3 +24,30 @@
   - /router - Настройка роутеров в боте
   - /utils - Вспомогательный функционал
 
+#### Ключевые моменты
+  - Инициализация бота: `bot = Bot(config.TOKEN, parse_mode=ParseMode.HTML)`
+  - Подгрузка данных из data.json:
+```
+f = open(config.DATA_PATH, "r", encoding="utf_8_sig")
+faculties_data = json.load(f)
+```
+  - Инъкция зависимостей, для избежания использования глобальных переменных и улучшения читаемости кода
+```
+dispatcher = Dispatcher(
+    bot=bot,
+    faculties_data=faculties_data["faculties"]
+)
+```
+  - Добавление роутеров
+```
+dispatcher.include_router(start_router)
+dispatcher.include_router(faculties_router)
+dispatcher.include_router(documents_router)
+```
+  - Запуск поллинга бота: `await dispatcher.start_polling(bot)`
+  - Настройка логирования и запуск бота в асинхронном режиме
+```
+if __name__ == "__main__":
+  logging.basicConfig(level=logging.INFO, stream=sys.stdout)
+  asyncio.run(main())
+```
