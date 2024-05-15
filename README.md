@@ -98,6 +98,41 @@ async def process_get_documents(callback: CallbackQuery):
     await callback.message.answer(texts.documents_info, reply_markup=document_keyboard())
 ```
 
+#### Роутер с информацией о факультетах и направлениях
+##### Инизиализация роутера: `faculties_router = Router()`
+##### Коллбэк получения списка факультетов
+```
+@start_router.message(CommandStart())
+@faculties_router.callback_query(GetFacultiesCallbackFactory.filter())
+async def process_get_faculties(callback: CallbackQuery, faculties_data: List[dict]):
+    await callback.message.delete()
+    await callback.message.answer("Перечень факультетов:\n", reply_markup=faculty_keyboard(faculties_data))
+
+```
+##### Коллбэк для получния списка направлений
+```
+@faculties_router.callback_query(GetWaysCallbackFactory.filter())
+async def process_get_ways(callback: CallbackQuery, callback_data: GetWaysCallbackFactory, faculties_data: List[dict]):
+    await callback.message.delete()
+    await callback.message.answer("Перечень направлений",
+                                  reply_markup=way_keyboard(faculties_data, faculty_id=callback_data.facultyId,
+                                  callback_data=callback_data))
+
+```
+##### Коллбэк для получения информации о направлении, с видеоанонсом
+```
+@faculties_router.callback_query(GetWayInfoCallbackFactory.filter())
+async def process_get_faculties(callback: CallbackQuery, callback_data: GetWayInfoCallbackFactory,
+                                faculties_data: List[dict]):
+    await callback.message.delete()
+    faculty_data = list(filter(lambda x: x["id"] == callback_data.faculty_id, faculties_data))[0]
+    way_data = list(filter(lambda x: x["id"] == callback_data.way_id, faculty_data["ways"]))[0]
+    text = f"{hlink(title=' ', url=faculty_data["video"])}{hbold(way_data['faculty'])}\n" + way_data["info"]
+    await callback.message.answer(text, reply_markup=back_keyboard(GetWaysCallbackFactory(facultyId=callback_data.faculty_id)))
+```
+
+
+
 
 
 
